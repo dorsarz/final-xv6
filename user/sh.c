@@ -78,47 +78,44 @@ void runcmd(struct cmd *cmd)
   default:
     panic("runcmd");
 
-case EXEC:
+    case EXEC:
     ecmd = (struct execcmd*)cmd;
-
-  
     if (ecmd->argv[0] == 0){exit(1);}
         
+          
+           if (strcmp(ecmd->argv[0], "!") == 0) {
+            
+            char buf[1024] = {0};
+            int len = 0;
 
-
-    if (ecmd->argv[0] && strcmp(ecmd->argv[0], "!") == 0) {
-        char buf[1024] = {0};
-        int len = 0;
-
-      
-        for (int i = 1; ecmd->argv[i] != 0; i++) {
-            if (i > 1)
-                buf[len++] = ' ';
-            int arglen = strlen(ecmd->argv[i]);
-            if (len + arglen >= sizeof(buf)) {
-                printf("Message too long\n");
-                exit(1);
+            for (int i = 1; ecmd->argv[i] != 0; i++) {
+                int arglen = strlen(ecmd->argv[i]);
+                if (len + arglen + 1 >= sizeof(buf)) {
+                    printf("Message too long\n");
+                    exit(0);
+                }
+                if (i > 1){buf[len++] = ' ';}
+                    
+                strcpy(buf + len, ecmd->argv[i]);
+                len += arglen;
             }
-            strcpy(buf + len, ecmd->argv[i]);
-            len += arglen;
+
+          
+            for (int i = 0; buf[i] != '\0'; i++) {
+                if (buf[i] == 'o' && buf[i+1] == 's') {
+                    printf("\033[34m%s\033[0m", "os");
+                    i++;
+                } else {
+                    printf("%c", buf[i]);
+                }
+            }
+            printf("\n");
+            exit(0);
         }
 
-    
-        for (int i = 0; i < len; ) {
-            if (i + 1 < len && buf[i] == 'o' && buf[i+1] == 's') {
-                printf("\033[34mos\033[0m");
-                i += 2;
-            } else {
-                write(1, &buf[i], 1);
-                i++;
-            }
-        }
-        printf("\n");
-        exit(0);
-    }
 
     exec(ecmd->argv[0], ecmd->argv);
-    printf("exec %s failed\n", ecmd->argv[0]);
+    fprintf(2, "exec %s failed\n", ecmd->argv[0]);
     break;
 
   case REDIR:
