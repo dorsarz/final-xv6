@@ -70,8 +70,8 @@ void runcmd(struct cmd *cmd)
   struct pipecmd *pcmd;
   struct redircmd *rcmd;
 
-  if (cmd == 0)
-    exit(1);
+  if (cmd == 0){
+    exit(1);}
 
   switch (cmd->type)
   {
@@ -80,8 +80,8 @@ void runcmd(struct cmd *cmd)
 
     case EXEC:
     ecmd = (struct execcmd*)cmd;
-    if (ecmd->argv[0] == 0)
-        exit(1);
+    if (ecmd->argv[0] == 0){
+        exit(1);}
     if (ecmd->argv[0] && strcmp(ecmd->argv[0], "!") == 0) {
         
         if (ecmd->argc > 1) {
