@@ -78,10 +78,30 @@ void runcmd(struct cmd *cmd)
   default:
     panic("runcmd");
 
-  case EXEC:
-    ecmd = (struct execcmd *)cmd;
+    case EXEC:
+    ecmd = (struct execcmd*)cmd;
     if (ecmd->argv[0] == 0)
-      exit(1);
+        exit(1);
+    if (ecmd->argv[0] && strcmp(ecmd->argv[0], "!") == 0) {
+        
+        if (ecmd->argc > 1) {
+            char *message = ecmd->argv[1];
+            if (strlen(message) > 512) {
+                printf("Message too long\n");
+                exit(0);
+            }
+            for (int i = 0; message[i] != '\0'; i++) {
+                if (message[i] == 'o' && message[i + 1] == 's') {
+                    printf("\033[34m%s\033[0m", "os"); 
+                    i++; 
+                } else {
+                    printf("%c", message[i]);
+                }
+            }
+        }
+        exit(0);
+    }
+
     exec(ecmd->argv[0], ecmd->argv);
     fprintf(2, "exec %s failed\n", ecmd->argv[0]);
     break;
