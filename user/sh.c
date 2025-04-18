@@ -78,71 +78,45 @@ void runcmd(struct cmd *cmd)
   default:
     panic("runcmd");
 
-<<<<<<< Updated upstream
-  case EXEC:
-  ecmd = (struct execcmd*)cmd;
-  if (ecmd->argv[0] == 0)
-      exit(1);
-  if (ecmd->argv[0] && strcmp(ecmd->argv[0], "!") == 0) {
-      
-      if (ecmd->argv > 1) {
-          char *message = ecmd->argv[1];
-          if (strlen(message) > 512) {
-              printf("Message too long\n");
-              exit(0);
-          }
-          for (int i = 0; message[i] != '\0'; i++) {
-              if (message[i] == 'o' && message[i + 1] == 's') {
-                  printf("\033[34m%s\033[0m", "os"); 
-                  i++; 
-              } else {
-                  printf("%c", message[i]);
-              }
-          }
-      }
-      exit(0);
-  }
-
-  exec(ecmd->argv[0], ecmd->argv);
-  fprintf(2, "exec %s failed\n", ecmd->argv[0]);
-  break;
-=======
     case EXEC:
     ecmd = (struct execcmd*)cmd;
-    if (ecmd->argv[0] == 0)
-        exit(1);
-   if (ecmd->argv[0] && strcmp(ecmd->argv[0], "!") == 0) {
-    char buf[1024] = {0};
-    int len = 0;
+    if (ecmd->argv[0] == 0){exit(1);}
+        
+          
+           if (strcmp(ecmd->argv[0], "!") == 0) {
+            
+            char buf[1024] = {0};
+            int len = 0;
 
-    for (int i = 1; ecmd->argv[i] != 0; i++) {
-        if (i > 1) buf[len++] = ' ';
-        int arglen = strlen(ecmd->argv[i]);
-        if (len + arglen >= sizeof(buf)) {
-            printf("Message too long\n");
+            for (int i = 1; ecmd->argv[i] != 0; i++) {
+                int arglen = strlen(ecmd->argv[i]);
+                if (len + arglen + 1 >= sizeof(buf)) {
+                    printf("Message too long\n");
+                    exit(0);
+                }
+                if (i > 1){buf[len++] = ' ';}
+                    
+                strcpy(buf + len, ecmd->argv[i]);
+                len += arglen;
+            }
+
+          
+            for (int i = 0; buf[i] != '\0'; i++) {
+                if (buf[i] == 'o' && buf[i+1] == 's') {
+                    printf("\033[34m%s\033[0m", "os");
+                    i++;
+                } else {
+                    printf("%c", buf[i]);
+                }
+            }
+            printf("\n");
             exit(0);
         }
-        strcpy(buf + len, ecmd->argv[i]);
-        len += arglen;
-    }
-
-    for (int i = 0; i < len; i++) {
-        if (buf[i] == 'o' && buf[i+1] == 's') {
-            printf("\033[34mos\033[0m");
-            i++;
-        } else {
-            printf("%c", buf[i]);
-        }
-    }
-    printf("\n");
-    exit(0); 
-}
 
 
     exec(ecmd->argv[0], ecmd->argv);
     fprintf(2, "exec %s failed\n", ecmd->argv[0]);
     break;
->>>>>>> Stashed changes
 
   case REDIR:
     rcmd = (struct redircmd *)cmd;
