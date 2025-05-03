@@ -106,7 +106,7 @@ case EXEC:
     
         for (int i = 0; i < len; ) {
             if (i + 1 < len && buf[i] == 'o' && buf[i+1] == 's') {
-                printf("\033[34mos\033[0m");
+                printf("%c[34m%s%c[0m", 27, "os", 27);
                 i += 2;
             } else {
                 printf("%c", buf[i]);
