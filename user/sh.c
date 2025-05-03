@@ -109,7 +109,7 @@ case EXEC:
                 printf("\033[34mos\033[0m");
                 i += 2;
             } else {
-                printf("%c", buf[i]);
+               printf("\033[30m%c\033[0m", buf[i]);
                 i++;
             }
         }
