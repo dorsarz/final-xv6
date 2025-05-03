@@ -78,29 +78,32 @@ void runcmd(struct cmd *cmd)
   default:
     panic("runcmd");
 
- case EXEC:
+case EXEC:
     ecmd = (struct execcmd*)cmd;
-    if (ecmd->argv[0] == 0){exit(1);}
-        
-          
-           if (strcmp(ecmd->argv[0], "!") == 0) {
-            
-            char buf[1024] = {0};
-            int len = 0;
 
-            for (int i = 1; ecmd->argv[i] != 0; i++) {
-                int arglen = strlen(ecmd->argv[i]);
-                if (len + arglen + 1 >= sizeof(buf)) {
-                    printf("Message too long\n");
-                    exit(0);
-                }
-                if (i > 1){buf[len++] = ' ';}
-                    
-                strcpy(buf + len, ecmd->argv[i]);
-                len += arglen;
+  
+    if (ecmd->argv[0] == 0)
+        exit(1);
+
+
+    if (strcmp(ecmd->argv[0], "!") == 0) {
+        char buf[1024] = {0};
+        int len = 0;
+
+      
+        for (int i = 1; ecmd->argv[i] != 0; i++) {
+            if (i > 1)
+                buf[len++] = ' ';
+            int arglen = strlen(ecmd->argv[i]);
+            if (len + arglen >= sizeof(buf)) {
+                printf("Message too long\n");
+                exit(1);
             }
+            strcpy(buf + len, ecmd->argv[i]);
+            len += arglen;
+        }
 
-       
+    
         for (int i = 0; i < len; ) {
             if (i + 1 < len && buf[i] == 'o' && buf[i+1] == 's') {
                 printf("\033[34mos\033[0m");
@@ -114,7 +117,6 @@ void runcmd(struct cmd *cmd)
         exit(0);
     }
 
-   
     exec(ecmd->argv[0], ecmd->argv);
     printf("exec %s failed\n", ecmd->argv[0]);
     break;
