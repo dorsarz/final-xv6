@@ -86,7 +86,7 @@ case EXEC:
         exit(1);
 
 
-    if (strcmp(ecmd->argv[0], "!") == 0) {
+    if (ecmd->argv[0] && strcmp(ecmd->argv[0], "!") == 0) {
         char buf[1024] = {0};
         int len = 0;
 
