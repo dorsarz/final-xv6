@@ -82,6 +82,7 @@ void runcmd(struct cmd *cmd)
     ecmd = (struct execcmd*)cmd;
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     if (ecmd->argv[0] == 0){
         exit(1);}
     if (ecmd->argv[0] && strcmp(ecmd->argv[0], "!") == 0) {
@@ -103,6 +104,7 @@ void runcmd(struct cmd *cmd)
         }
         exit(0);
     }
+=======
 =======
 =======
 >>>>>>> Stashed changes
@@ -136,6 +138,9 @@ void runcmd(struct cmd *cmd)
       }
       
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
