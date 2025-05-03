@@ -78,16 +78,15 @@ void runcmd(struct cmd *cmd)
   default:
     panic("runcmd");
 
-    case EXEC:
+ case EXEC:
     ecmd = (struct execcmd*)cmd;
-  if (ecmd->argv[0] == 0) {
-    exit(1);
-  }
+    if (ecmd->argv[0] == 0){exit(1);}
+        
           
-   if (strcmp(ecmd->argv[0], "!") == 0) {
+           if (strcmp(ecmd->argv[0], "!") == 0) {
             
-   char buf[1024] = {0};
-    int len = 0;
+            char buf[1024] = {0};
+            int len = 0;
 
             for (int i = 1; ecmd->argv[i] != 0; i++) {
                 int arglen = strlen(ecmd->argv[i]);
@@ -101,22 +100,23 @@ void runcmd(struct cmd *cmd)
                 len += arglen;
             }
 
-          
-            for (int i = 0; buf[i] != '\0'; i++) {
-                if (buf[i] == 'o' && buf[i+1] == 's') {
-                    printf("\033[34m%s\033[0m", "os");
-                    i++;
-                } else {
-                    printf("%c", buf[i]);
-                }
+       
+        for (int i = 0; i < len; ) {
+            if (i + 1 < len && buf[i] == 'o' && buf[i+1] == 's') {
+                printf("\033[34mos\033[0m");
+                i += 2;
+            } else {
+                printf("%c", buf[i]);
+                i++;
             }
-            printf("\n");
-            exit(0);
         }
+        printf("\n");
+        exit(0);
+    }
 
-
+   
     exec(ecmd->argv[0], ecmd->argv);
-    fprintf(2, "exec %s failed\n", ecmd->argv[0]);
+    printf("exec %s failed\n", ecmd->argv[0]);
     break;
 
   case REDIR:
