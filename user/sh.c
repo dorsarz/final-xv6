@@ -80,13 +80,14 @@ void runcmd(struct cmd *cmd)
 
     case EXEC:
     ecmd = (struct execcmd*)cmd;
-    if (ecmd->argv[0] == 0){exit(1);}
-        
+  if (ecmd->argv[0] == 0) {
+    exit(1);
+  }
           
-           if (strcmp(ecmd->argv[0], "!") == 0) {
+   if (strcmp(ecmd->argv[0], "!") == 0) {
             
-            char buf[1024] = {0};
-            int len = 0;
+   char buf[1024] = {0};
+    int len = 0;
 
             for (int i = 1; ecmd->argv[i] != 0; i++) {
                 int arglen = strlen(ecmd->argv[i]);
