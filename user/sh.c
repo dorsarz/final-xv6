@@ -1,8 +1,10 @@
 // Shell.
-
 #include "kernel/types.h"
 #include "user/user.h"
 #include "kernel/fcntl.h"
+
+
+
 
 // Parsed command representation
 #define EXEC 1
@@ -82,8 +84,8 @@ case EXEC:
     ecmd = (struct execcmd*)cmd;
 
   
-    if (ecmd->argv[0] == 0)
-        exit(1);
+    if (ecmd->argv[0] == 0){exit(1);}
+        
 
 
     if (ecmd->argv[0] && strcmp(ecmd->argv[0], "!") == 0) {
@@ -109,7 +111,7 @@ case EXEC:
                 printf("\033[34mos\033[0m");
                 i += 2;
             } else {
-                putchar(buf[i]);
+               write(1, &buf[i], 1);
                 i++;
             }
         }
