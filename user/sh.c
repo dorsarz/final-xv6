@@ -161,17 +161,6 @@ case EXEC:
           printf("\n");
           exit(0); 
       }
-      
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> 0c0a5a2aedc66ec04ac94df3fa51dec3f5e8b6e3
-
     exec(ecmd->argv[0], ecmd->argv);
     printf("exec %s failed\n", ecmd->argv[0]);
     break;
