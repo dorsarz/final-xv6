@@ -11883,7 +11883,7 @@ void log_message(log_level_t level, const char *message)
     log_lock_initialized = 1;
   }
 
-  acquire(&log_lock);  // گرفتن قفل
+  acquire(&log_lock);  
     8000531c:	0001c517          	auipc	a0,0x1c
     80005320:	93450513          	addi	a0,a0,-1740 # 80020c50 <log_lock>
     80005324:	8d1fb0ef          	jal	80000bf4 <acquire>
@@ -11905,7 +11905,7 @@ void log_message(log_level_t level, const char *message)
   while (*prefix)
     80005344:	00094503          	lbu	a0,0(s2)
     80005348:	c519                	beqz	a0,80005356 <log_message+0x54>
-    uartputc_sync(*prefix++);  // یا consputc
+    uartputc_sync(*prefix++);  
     8000534a:	0905                	addi	s2,s2,1
     8000534c:	d08fb0ef          	jal	80000854 <uartputc_sync>
   while (*prefix)
@@ -11926,7 +11926,7 @@ void log_message(log_level_t level, const char *message)
     80005368:	4529                	li	a0,10
     8000536a:	ceafb0ef          	jal	80000854 <uartputc_sync>
 
-  release(&log_lock);  // آزادسازی قفل
+  release(&log_lock);
     8000536e:	0001c517          	auipc	a0,0x1c
     80005372:	8e250513          	addi	a0,a0,-1822 # 80020c50 <log_lock>
     80005376:	917fb0ef          	jal	80000c8c <release>
