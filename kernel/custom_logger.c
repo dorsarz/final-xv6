@@ -4,7 +4,7 @@
 #include "custom_logger.h"
 #include "spinlock.h"
 
-extern void uartputc_sync(int);  // یا consputc اگر می‌خوای به ترمینال بیاد
+extern void uartputc_sync(int);  
 
 static const char* log_level_strings[] = {
   "INFO — ",
@@ -22,7 +22,7 @@ void log_message(log_level_t level, const char *message)
     log_lock_initialized = 1;
   }
 
-  acquire(&log_lock);  // گرفتن قفل
+  acquire(&log_lock);  
 
   if (level < LOG_INFO || level > LOG_ERROR) {
     release(&log_lock);
@@ -31,14 +31,14 @@ void log_message(log_level_t level, const char *message)
 
   const char *prefix = log_level_strings[level];
   while (*prefix)
-    uartputc_sync(*prefix++);  // یا consputc
+    uartputc_sync(*prefix++);  
 
   while (*message)
     uartputc_sync(*message++);
 
   uartputc_sync('\n');
 
-  release(&log_lock);  // آزادسازی قفل
+  release(&log_lock);
 }
 
 
