@@ -97,7 +97,7 @@ sys_uptime(void)
 uint64 
 sys_trigger(void) 
 {
-  log_message(0, "INFO −  This is a log to test a new xv6 system call");
+  log_message(0, "This is a log to test a new xv6 system call");
   return 0;
 }
 
