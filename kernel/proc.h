@@ -109,4 +109,4 @@ the process
 struct thread *current_thread; // Pointer to the currently
 running thread
 };
-};
+
