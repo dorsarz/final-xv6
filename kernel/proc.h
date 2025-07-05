@@ -109,3 +109,23 @@ the process
 struct thread *current_thread; // Pointer to the currently
 running thread
 };
+
+struct thread
+{
+  enum threadstate state;
+  struct trapframe *trapframe; 
+  uint id;
+  uint join;
+  int sleep_n;
+  uint sleep_tick0;
+  
+};
+
+enum threadstate{
+   THREAD_UNUSED,
+   THREAD_RUNNABLE,
+   THREAD_RUNNING,
+   THREAD_JOINED,
+   THREAD_SLEEPING
+};
+
