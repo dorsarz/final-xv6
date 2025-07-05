@@ -104,9 +104,5 @@ struct proc {
   struct file *ofile[NOFILE];  // Open files
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
-  struct thread threads[NTHREAD]; // Array of threads belonging to
-the process
-struct thread *current_thread; // Pointer to the currently
-running thread
+  
 };
-
