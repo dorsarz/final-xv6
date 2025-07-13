@@ -102,6 +102,9 @@ extern uint64 sys_link(void);
 extern uint64 sys_mkdir(void);
 extern uint64 sys_close(void);
 extern uint64 sys_trigger(void);
+extern uint64 sys_thread(void);
+extern uint64 sys_jointhread(void);
+
 
 
 // An array mapping syscall numbers from syscall.h
@@ -129,6 +132,8 @@ static uint64 (*syscalls[])(void) = {
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
 [SYS_trigger] sys_trigger,
+[SYS_thread] sys_thread,
+[SYS_jointhread] sys_jointhread,
 
 };
 
