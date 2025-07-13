@@ -47,6 +47,8 @@ proc_mapstacks(pagetable_t kpgtbl)
 void
 procinit(void)
 {
+  p->current_thread = 0;
+
   struct proc *p;
   
   initlock(&pid_lock, "nextpid");
@@ -55,7 +57,6 @@ procinit(void)
       initlock(&p->lock, "proc");
       p->state = UNUSED;
       p->kstack = KSTACK((int) (p - proc));
-      p->current_thread = 0; 
   }
 }
 
@@ -170,11 +171,10 @@ freeproc(struct proc *p)
   p->killed = 0;
   p->xstate = 0;
   p->state = UNUSED;
-
   p->current_thread = 0;
-  for (int i = 0; i < NTHREAD; ++i) {
-    freethread(&p->threads[i]);
-  }
+for (int i = 0; i < NTHREAD; ++i)
+  freethread(&p->threads[i]);
+
 }
 
 // Create a user page table for a given process, with no user memory,
@@ -450,39 +450,37 @@ wait(uint64 addr)
 void
 scheduler(void)
 {
-struct proc *p;
-struct cpu *c = mycpu();
-c->proc = 0;
-for(;;){
-// The most recent process to run may have had interrupts
-// turned off; enable them to avoid a deadlock if all
-// processes are waiting.
-intr_on();
-int found = 0;
-for(p = proc; p < &proc[NPROC]; p++) {
-acquire(&p->lock);
-if(p->state == RUNNABLE) {
-// Switch to chosen process. It is the process's job
-// to release its lock and then reacquire it
-// before jumping back to us.
-if (thread_schd(p)) {
-p->state = RUNNING;
-c->proc = p;
-swtch(&c->context, &p->context);
-// Process is done running for now.
-// It should have changed its p->state before coming back.
-c->proc = 0;
-found = 1;
- }
-}
-release(&p->lock);
-}
-if(found == 0) {
-// nothing to run; stop running on this core until an interrupt.
-intr_on();
-asm volatile("wfi");
+  struct proc *p;
+  struct cpu *c = mycpu();
+
+  c->proc = 0;
+  for(;;){
+    // The most recent process to run may have had interrupts
+    // turned off; enable them to avoid a deadlock if all
+    // processes are waiting.
+    intr_on();
+
+    int found = 0;
+    for(p = proc; p < &proc[NPROC]; p++) {
+      acquire(&p->lock);
+     if (p->state == RUNNABLE) {
+  if (thread_schd(p)) {
+    p->state = RUNNING;
+    c->proc = p;
+    swtch(&c->context, &p->context);
+    c->proc = 0;
+    found = 1;
   }
- }
+}
+
+      release(&p->lock);
+    }
+    if(found == 0) {
+      // nothing to run; stop running on this core until an interrupt.
+      intr_on();
+      asm volatile("wfi");
+    }
+  }
 }
 
 // Switch to scheduler.  Must hold only p->lock
@@ -777,3 +775,65 @@ t->sleep_tick0 = ticks0;
 t->state = THREAD_SLEEPING;
 thread_schd(myproc());
 }
+
+struct thread* initthread(struct proc *p) {
+  if (!p->current_thread) {
+    for (int i = 0; i < NTHREAD; ++i)
+      freethread(&p->threads[i]);
+
+    struct thread *t = &p->threads[0];
+    t->id = p->pid;
+
+    if ((t->trapframe = (struct trapframe *)kalloc()) == 0) {
+      freethread(t);
+      return 0;
+    }
+
+    t->state = THREAD_RUNNING;
+    p->current_thread = t;
+  }
+  return p->current_thread;
+}
+int thread_schd(struct proc *p) {
+  if (!p->current_thread)
+    return 1;
+
+  if (p->current_thread->state == THREAD_RUNNING)
+    p->current_thread->state = THREAD_RUNNABLE;
+
+  acquire(&tickslock);
+  uint ticks0 = ticks;
+  release(&tickslock);
+
+  struct thread *next = 0;
+  struct thread *t = p->current_thread + 1;
+
+  for (int i = 0; i < NTHREAD; i++, t++) {
+    if (t >= p->threads + NTHREAD)
+      t = p->threads;
+
+    if (t->state == THREAD_RUNNABLE ||
+        (t->state == THREAD_SLEEPING && ticks0 - t->sleep_tick0 >= t->sleep_n)) {
+      next = t;
+      break;
+    }
+  }
+
+  if (!next)
+    return 0;
+
+  next->state = THREAD_RUNNING;
+
+  struct thread *prev = p->current_thread;
+  p->current_thread = next;
+
+  if (prev->trapframe)
+    *prev->trapframe = *p->trapframe;
+
+  *p->trapframe = *next->trapframe;
+
+  return 1;
+}
+
+
+scheduler
