@@ -101,3 +101,10 @@ sys_trigger(void)
   return 0;
 }
 
+uint64 
+sys_jointhread(void) {
+int id;
+argint(0, &id);
+return jointhread(id);
+}
+
