@@ -1,53 +1,60 @@
-#include "user/user.h"
-#include "kernel/types.h"
+#include "../kernel/types.h"
+#include "../kernel/param.h"
+#include "../kernel/memlayout.h"
+#include "../kernel/riscv.h"
+#include "../kernel/spinlock.h"
+#include "../kernel/proc.h"
+#include "../user/user.h"
 
-volatile int print_lock = 0;
+#define STACK_SIZE  100
 
-void acquire_print_lock() {
-  while (__sync_lock_test_and_set(&print_lock, 1)) {}
-}
-
-void release_print_lock() {
-  __sync_lock_release(&print_lock);
-}
-
-struct thread_data {
-  int thread_id;
-  uint64 start_number;
-};
-
-void my_thread(void *arg) {
-  struct thread_data *data = (struct thread_data *) arg;
-  for (int i = 0; i < 10; ++i) {
-    data->start_number++;
-
-    acquire_print_lock();
-    printf("thread %d: %lu\n", data->thread_id, data->start_number);
-    release_print_lock();
-
-    sleep(0);
+void safe_print(const char *s, uint64 num) {
+  char buf[64];
+  int i = 0;
+  for (const char *p = s; *p; p++)
+    buf[i++] = *p;
+  if (num == 0) {
+    buf[i++] = '0';
+  } else {
+    char tmp[32];
+    int t = 0;
+    while (num) {
+      tmp[t++] = '0' + (num % 10);
+      num /= 10;
+    }
+    while (t--)
+      buf[i++] = tmp[t];
   }
-  exitthread();
+  buf[i++] = '\n';
+  write(1, buf, i);
+}
+
+void *my_thread(void *arg) {
+  uint64 number = (uint64)arg;
+  for (int i = 0; i < 100; i++) {
+    number++;
+    safe_print("thread: ", number);
+  }
+  return (void *)number;
 }
 
 int main(int argc, char *argv[]) {
-  static struct thread_data data1 = {1, 100};
-  static struct thread_data data2 = {2, 200};
-  static struct thread_data data3 = {3, 300};
+  int sp1[STACK_SIZE], sp2[STACK_SIZE], sp3[STACK_SIZE];
 
-  uint64 sp1[4096/8], sp2[4096/8], sp3[4096/8];
+  int ta = thread(my_thread, sp1 + STACK_SIZE, (void *)100);
+  safe_print("NEW THREAD CREATED ", ta);
 
-  int ta = thread_create(my_thread, (void*)(sp1 + 4096/8), (void*)&data1);
-  printf("NEW THREAD CREATED 1\n");
-  int tb = thread_create(my_thread, (void*)(sp2 + 4096/8), (void*)&data2);
-  printf("NEW THREAD CREATED 2\n");
-  int tc = thread_create(my_thread, (void*)(sp3 + 4096/8), (void*)&data3);
-  printf("NEW THREAD CREATED 3\n");
+  int tb = thread(my_thread, sp2 + STACK_SIZE, (void *)200);
+  safe_print("NEW THREAD CREATED ", tb);
+
+  int tc = thread(my_thread, sp3 + STACK_SIZE, (void *)300);
+  safe_print("NEW THREAD CREATED ", tc);
+
 
   jointhread(ta);
   jointhread(tb);
   jointhread(tc);
 
-  printf("DONE\n");
+  safe_print("DONE ", 0);
   exit(0);
 }

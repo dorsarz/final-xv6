@@ -101,22 +101,21 @@ sys_trigger(void)
   return 0;
 }
 
-uint64 
-sys_jointhread(void) {
-int id;
-argint(0, &id);
-return jointhread(id);
-}
-uint64 sys_thread_create(void) {
-  uint64 fcn, arg, stack;
-  if (argaddr(0, &fcn) < 0 || argaddr(1, &stack) < 0 || argaddr(2, &arg) < 0)
-    return -1;
-  return thread_create((void*)fcn, (void*)stack, (void*)arg);
+uint64
+sys_thread(void) {
+  uint64 start_thread, stack_address, arg;
+  argaddr(0, &start_thread);
+  argaddr(1, &stack_address);
+  argaddr(2, &arg);
+  struct thread *t = allocthread(start_thread, stack_address, arg);
+  return t ? t->id : 0;
 }
 
-uint64 sys_exitthread(void) {
-  exitthread();
-  return 0; // never reached
+uint64
+sys_jointhread(void) {
+  int id;
+  argint(0, &id);
+  return jointhread(id);
 }
 
 
