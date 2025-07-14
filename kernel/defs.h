@@ -188,7 +188,6 @@ void            virtio_disk_intr(void);
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))
 struct thread;
-void exitthread();
 void freethread(struct thread *t);
 struct thread* allocthread(uint64 start_thread, uint64 stack_address,
 uint64 arg);
@@ -196,3 +195,5 @@ int jointhread(uint id);
 void sleepthread(int n, uint ticks0);
 int thread_schd(struct proc *p);
 struct thread* initthread(struct proc *p);
+int thread_create(void (*start_routine)(void*), void *stack, void *arg);
+void exitthread(void);

@@ -107,4 +107,17 @@ int id;
 argint(0, &id);
 return jointhread(id);
 }
+uint64 sys_thread_create(void) {
+  uint64 fcn, arg, stack;
+  if (argaddr(0, &fcn) < 0 || argaddr(1, &stack) < 0 || argaddr(2, &arg) < 0)
+    return -1;
+  return thread_create((void*)fcn, (void*)stack, (void*)arg);
+}
+
+uint64 sys_exitthread(void) {
+  exitthread();
+  return 0; // never reached
+}
+
+
 
