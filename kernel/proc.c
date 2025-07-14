@@ -47,7 +47,7 @@ proc_mapstacks(pagetable_t kpgtbl)
 void
 procinit(void)
 {
-  p->current_thread = 0;
+ 
 
   struct proc *p;
   
@@ -57,6 +57,7 @@ procinit(void)
       initlock(&p->lock, "proc");
       p->state = UNUSED;
       p->kstack = KSTACK((int) (p - proc));
+      p->current_thread = 0; //Initialize current_thread to indicateno active thread
   }
 }
 
@@ -818,8 +819,7 @@ t = p->threads;
 if (t->state == THREAD_RUNNABLE) {
 next = t;
 break;
-} else if (t->state == THREAD_SLEEPING && ticks0 - t-
->sleep_tick0 >= t->sleep_n) {
+} else if (t->state == THREAD_SLEEPING && ticks0 - t->sleep_tick0 >= t->sleep_n) {
 next = t;
 break;
 }
