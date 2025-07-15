@@ -97,7 +97,47 @@ sys_uptime(void)
 uint64 
 sys_trigger(void) 
 {
-  log_message(0, "INFO −  This is a log to test a new xv6 system call");
+  log_message(0, "This is a log to test a new xv6 system call");
   return 0;
 }
 
+uint64 sys_thread(void) {
+  uint64 start_thread, stack_address, arg;
+  argaddr(0, &start_thread);
+  argaddr(1, &stack_address);
+  argaddr(2, &arg);
+  struct thread *t = allocthread(start_thread, stack_address, arg);
+  return t ? t->id : 0;
+  }
+
+uint64 sys_jointhread(void) {
+    int id;
+    argint(0, &id);
+    return jointhread(id);
+    }
+
+uint64
+sys_sleep(void)
+{
+int n;
+uint ticks0;
+argint(0, &n);
+if(n < 0)
+n = 0;
+acquire(&tickslock);
+ticks0 = ticks;
+if (myproc()->current_thread) {
+release(&tickslock);
+sleepthread(n, ticks0);
+return 0;
+}
+while(ticks - ticks0 < n){
+if(killed(myproc())){
+release(&tickslock);
+return -1;
+}
+sleep(&ticks, &tickslock);
+}
+release(&tickslock);
+return 0;
+}
